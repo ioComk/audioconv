@@ -92,7 +92,7 @@ def savesrcimg(name_drysrc, inst, angle_src, pos_mic,
                 savestyle='wav',
                 output_folder='output',
                 fs_src=8000, fs_imp=48000, fs_output=16000,
-                kind='RWCP_E2A',):
+                kind='E2A',):
     '''
     [input]
         name_drysrc : path to dry source directory
@@ -108,7 +108,7 @@ def savesrcimg(name_drysrc, inst, angle_src, pos_mic,
     img = create_srcimg(name_drysrc, inst, angle_src, pos_mic,
                         fs_src=fs_src, fs_imp=fs_imp, kind=kind)
 
-    folder = Path(output_folder) / Path(name_drysrc)
+    folder = Path(output_folder) / Path(name_drysrc+'_'+kind)
 
     if not folder.exists():
         folder.mkdir(parents=True)
@@ -127,10 +127,10 @@ def savesrcimg(name_drysrc, inst, angle_src, pos_mic,
 
     elif savestyle == 'stereowav':
         assert len(pos_mic) == 2, "number of mics has to be 2 in 'stereowav'."
-        filename = '{inst}_src{ang}_mic{pos}.wav'
+        filename = '{inst}_{kind}_pos{ang}_mic{pos}.wav'
         filepath = str(folder / Path(filename))
         for n in range(len(inst)):
-            fname = filepath.format(inst=inst[n],ang=angle_src[n],
+            fname = filepath.format(inst=inst[n],kind=kind,ang=angle_src[n],
                                         pos=str(pos_mic[0])+str(pos_mic[1]))
             res = librosa.resample(img[n, :, :], fs_src, fs_output)
             sf.write(fname, res.T, fs_output)
@@ -138,10 +138,10 @@ def savesrcimg(name_drysrc, inst, angle_src, pos_mic,
     # リサンプルして書き出しは未実装
     elif savestyle == 'triwav':
         assert len(pos_mic) == 3, "number of mics has to be 3 in 'triwav'."
-        filename = '{inst}_src{ang}_mic{pos}.wav'
+        filename = '{kind}_{inst}_pos{ang}_mic{pos}.wav'
         filepath = str(folder / Path(filename))
         for n in range(len(inst)):
-            fname = filepath.format(inst=inst[n],ang=angle_src[0],
+            fname = filepath.format(inst=inst[n],kind=kind,ang=angle_src[0],
                                         pos=str(pos_mic[0])+str(pos_mic[1])+str(pos_mic[2]))
             sf.write(fname, img[n, :, :].T, fs_src)
 
@@ -167,40 +167,40 @@ if __name__ == '__main__':
     ]
 
     # Song ID 1 ----------------------------------------------
-    folder_path = 'drySources\music\dev1__bearlin-roads'
+    folder_path = 'drySources/music/bearlin-roads'
     src = [
-        'dev1__bearlin-roads__snip_85_99__vocals',
-        'dev1__bearlin-roads__snip_85_99__drums'
+        'bearlin-roads__snip_85_99__vocals',
+        'bearlin-roads__snip_85_99__drums'
     ]
     # --------------------------------------------------------
 
     # Song ID 2 ----------------------------------------------
-    # folder_path = 'drySources\music\dev2__another_dreamer-the_ones_we_love'
+    # folder_path = 'drySources/music/another_dreamer-the_ones_we_love'
     # src = [
-    #     'dev2__another_dreamer-the_ones_we_love__snip_69_94__vocals',
-    #     'dev2__another_dreamer-the_ones_we_love__snip_69_94__drums',
+    #     'another_dreamer-the_ones_we_love__snip_69_94__vocals',
+    #     'another_dreamer-the_ones_we_love__snip_69_94__drums',
     # ]
     # --------------------------------------------------------
 
     # Song ID 3 ----------------------------------------------
-    # folder_path = 'drySources\music\dev2__fort_minor-remember_the_name'
+    # folder_path = 'drySources/music/fort_minor-remember_the_name'
     # src = [
-    #     'dev2__fort_minor-remember_the_name__snip_54_78__vocals',
-    #     'dev2__fort_minor-remember_the_name__snip_54_78__drums',
+    #     'fort_minor-remember_the_name__snip_54_78__vocals',
+    #     'fort_minor-remember_the_name__snip_54_78__drums',
     # ]
     # --------------------------------------------------------
 
     # Song ID 4 ----------------------------------------------
-    # folder_path = 'drySources\music\dev2__ultimate_nz_tour'
+    # folder_path = 'drySources/music/ultimate_nz_tour'
     # src = [
-    #     'dev2__ultimate_nz_tour__snip_43_61__vocals',
-    #     'dev2__ultimate_nz_tour__snip_43_61__drums',
+    #     'ultimate_nz_tour__snip_43_61__vocals',
+    #     'ultimate_nz_tour__snip_43_61__drums',
     # ]
     # --------------------------------------------------------
     
 
     savesrcimg(folder_path, src, mic_angle, mic_pos,
             savestyle='stereowav', fs_src=44100, fs_imp=48000, fs_output=fs_output,
-            kind='RWCP_E2A_full')
+            kind='E2A')
 
     print('finished!')
